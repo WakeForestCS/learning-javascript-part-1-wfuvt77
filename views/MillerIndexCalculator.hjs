@@ -1,0 +1,700 @@
+<!-- This app uses JavaScript to calculate Miller Indices given input vectors.
+Creatde by Jack Treadwell 1/25/18
+-->
+<!DOCTYPE html>
+<html land="eng">
+
+  <!-- head contains title and link to stylesheet-->
+  <head>
+
+    <title>Miller Index / Dot Product / Cross Product</title>
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+  </head>
+
+  <!-- in doc css adjustments to the style sheet for aesthetic purposes -->
+  <style>
+
+    p,h2,h4,button{
+
+      margin-left: 10px;
+      font-family:sans-serif;
+    }
+    p.flip,h2.flip, h4.flip{
+
+      align-content: left;
+    }
+
+    h2{
+
+      margin-top:35px;
+    }
+    footer,header{
+
+      background-color: black;
+      color: white;
+      padding: 10px;
+      font-family: sans-serif;
+
+    }
+    header{
+
+      font-size:20px;
+    }
+
+  </style>
+
+  <body>
+    <!-- header for page -->
+    <header>
+        Miller Index Calculator, Dot Product Calculator, Cross Product Calculator
+    </header>
+
+    <div class = "bodyfull">
+
+
+    <!-- Title for page -->
+
+    <h2 class = "starter-template">Miller Index Calculator, Dot Product Calculator, Cross Product Calculator</h2>
+    <br>
+
+    <!-- Description of Miller Indices -->
+
+    <p class = "starter-template">
+      Miller Indices are a form of notation used to represent the orientation of planes in crystal lattices. <br>
+      They are expressed in terms of the three primary vectors that define the planes: a1 or a, a2 or b, and a3 or c.<br>
+      Negative values are represented by an overbar instead of a negative sign.
+    </p>
+
+    <br>
+
+      <!-- Button that calls javascript function -->
+
+      <button class = "btn btn-primary" onclick = "millerFunc(success)" >
+        Calculate Miller Index
+      </button>
+      <button class = "btn btn-primary" onclick = "dotFunc(success)" >
+        Calculate Dot Product
+      </button>
+      <button class = "btn btn-primary" onclick = "crossFunc(success)" >
+        Calculate Cross Product
+      </button>
+
+
+    <br><br><br>
+
+
+        <h4 class = "starter-template">Miller Index Results</h4>
+
+        <!-- this is the table modified by the javascript function to display the results -->
+          			<table class="table table-hover" id="millerResultTable">
+          				<tbody>
+
+                		<tr>
+          						<th data-field="a1">a1</th>
+          						<th data-field="a2">a2</th>
+          						<th data-field="a3">a3</th>
+                      <th data-field="millerdex">Miller Index</th>
+          						<th></th>
+          					</tr>
+          				</tbody>
+          			</table>
+
+          <br><br><br>
+
+          <!-- this table holds the dot product results -->
+    <h4 class = "starter-template">Dot Product Results</h4>
+      <table class="table table-hover" id="dotResultTable">
+        <tbody>
+
+          <tr>
+            <th data-field="x1">x1</th>
+            <th data-field="y1">y1</th>
+            <th data-field="z1">z1</th>
+            <th data-field="x2">x2</th>
+            <th data-field="y2">y2</th>
+            <th data-field="z2">z2</th>
+            <th data-field="result">Result</th>
+            <th></th>
+          </tr>
+        </tbody>
+      </table>
+
+    <br><br><br>
+
+    <!--  this table holds the cross product results -->
+    <h4 class = "starter-template">Cross Product Results</h4>
+      <table class="table table-hover" id="crossResultTable">
+        <tbody>
+
+          <tr>
+            <th data-field="x1">x1</th>
+            <th data-field="y1">y1</th>
+            <th data-field="z1">z1</th>
+            <th data-field="x2">x2</th>
+            <th data-field="y2">y2</th>
+            <th data-field="z2">z2</th>
+            <th data-field="xres"> x Result</th>
+            <th data-field="yres"> y Result</th>
+            <th data-field="yres"> y Result</th>
+            <th></th>
+          </tr>
+        </tbody>
+      </table>
+
+    <br><br><br>
+
+
+
+
+
+      <!-- image of basic miller indices supplied by wikipedia. code taken from their guide to linking images -->
+      <a title="By Miller_Indices_Cubes.svg: *Indices_miller_plan_exemple_cube.png: Cdang derivative work: McSush (talk) derivative work: Paco00002 (Miller_Indices_Cubes.svg)
+      [CC-BY-SA-3.0 (http://creativecommons.org/licenses/by-sa/3.0/) or GFDL (http://www.gnu.org/copyleft/fdl.html)], via Wikimedia Commons"
+       href="https://commons.wikimedia.org/wiki/File%3AMiller_Indices_Cubes2.svg"><img width="512" alt="Miller Indices Cubes2" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Miller_Indices_Cubes2.svg/512px-Miller_Indices_Cubes2.svg.png"/></a>
+       <p>Basic Miller Index Configurations taken from Wikipedia</p>
+       <br><br><br>
+
+
+       <!-- footer for a nice finish -->
+       <footer>
+         <div id="footer">
+           <p class>Created by Jack Treadwell for CSC331</p>
+          </div>
+       </footer>
+
+  </body>
+
+  <!-- script for the app -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"> </script>
+  <script>
+
+    //number of entries in the miller table
+    var numMillerEntries = 0;
+
+    //this holds each miller table row
+    var entriesMillerStack = [{a1: 0, a2: 0, a3: 0, result: "0"}];
+
+    //number of entries in the dot product table-hover
+    var numDotEntries = 0;
+
+    //this holds each dot product rows
+    var entriesDotStack = [{x1: 0, y1: 0, z1: 0, x2: 0, y2: 0, y3: 0, result: 0}];
+
+    //this holds the number of cross product table
+    var numCrossEntries = 0;
+
+    //this holds each cross product row
+    var entriesCrossStack = [{x1: 0, y1: 0, z1: 0, x2: 0, y2: 0, y3: 0, xres: 0, yres: 0, zres: 0}];
+
+
+
+
+
+    //callback function to check for success
+    function success(){
+      console.log("success!");
+    }
+
+
+
+
+    //function to add to the miller table
+    function addMillerNode(callback){
+
+      //find the table
+      var table = document.getElementById("millerResultTable");
+
+      //ge tthe number of rows
+      var numRows = table.getElementsByTagName("tr").length;
+
+      //clear the rows
+      for(i = numRows -1; i > 0; i--){
+        table.deleteRow(i);
+      }
+
+      var resultNum = numMillerEntries;
+
+      //for all the potential entries
+      for(i = 0; i < numMillerEntries; ++i){
+
+        //ge thte row
+        var row = table.insertRow(i+1);
+
+        //put in four celss
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+
+        //put in the most recently calculated data first
+        cell1.innerHTML = entriesMillerStack[numMillerEntries - i].a1;
+        cell2.innerHTML = entriesMillerStack[numMillerEntries - i].a2;
+        cell3.innerHTML = entriesMillerStack[numMillerEntries - i].a3;
+        cell4.innerHTML = entriesMillerStack[numMillerEntries - i].result;
+
+      }
+
+      //trigger a callback if there is one
+      if(callback){
+
+        callback();
+      }
+
+
+    }
+
+
+
+
+
+    //function to add to the dot table
+    function addDotNode(callback){
+
+      //find the table
+      var table = document.getElementById("dotResultTable");
+
+      //ge tthe number of rows
+      var numRows = table.getElementsByTagName("tr").length;
+
+      //clear the rows
+      for(i = numRows -1; i > 0; i--){
+        table.deleteRow(i);
+      }
+
+      var resultNum = numDotEntries;
+
+      //for all the potential entries
+      for(i = 0; i < numDotEntries; ++i){
+
+        //ge thte row
+        var row = table.insertRow(i+1);
+
+        //put in four celss
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        var cell6 = row.insertCell(5);
+        var cell7 = row.insertCell(6);
+
+        //put in the most recently calculated data first
+        cell1.innerHTML = entriesDotStack[numDotEntries - i].x1;
+        cell2.innerHTML = entriesDotStack[numDotEntries - i].y1;
+        cell3.innerHTML = entriesDotStack[numDotEntries - i].z1;
+        cell4.innerHTML = entriesDotStack[numDotEntries - i].x2;
+        cell5.innerHTML = entriesDotStack[numDotEntries - i].y2;
+        cell6.innerHTML = entriesDotStack[numDotEntries - i].z2;
+        cell7.innerHTML = entriesDotStack[numDotEntries - i].result;
+
+
+      }
+
+      //trigger a callback if there is one
+      if(callback){
+
+        callback();
+      }
+
+
+    }
+
+    //function to add to the cross table
+    function addCrossNode(callback){
+
+      //find the table
+      var table = document.getElementById("crossResultTable");
+
+      //ge tthe number of rows
+      var numRows = table.getElementsByTagName("tr").length;
+
+      //clear the rows
+      for(i = numRows -1; i > 0; i--){
+        table.deleteRow(i);
+      }
+
+      var resultNum = numCrossEntries;
+
+      //for all the potential entries
+      for(i = 0; i < numCrossEntries; ++i){
+
+        //ge thte row
+        var row = table.insertRow(i+1);
+
+        //put in four celss
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        var cell6 = row.insertCell(5);
+        var cell7 = row.insertCell(6);
+        var cell8 = row.insertCell(7);
+        var cell9 = row.insertCell(8);
+
+        //put in the most recently calculated data first
+        cell1.innerHTML = entriesCrossStack[numCrossEntries - i].x1;
+        cell2.innerHTML = entriesCrossStack[numCrossEntries - i].y1;
+        cell3.innerHTML = entriesCrossStack[numCrossEntries - i].z1;
+        cell4.innerHTML = entriesCrossStack[numCrossEntries - i].x2;
+        cell5.innerHTML = entriesCrossStack[numCrossEntries - i].y2;
+        cell6.innerHTML = entriesCrossStack[numCrossEntries - i].z2;
+        cell7.innerHTML = entriesCrossStack[numCrossEntries - i].xres;
+        cell8.innerHTML = entriesCrossStack[numCrossEntries - i].yres;
+        cell9.innerHTML = entriesCrossStack[numCrossEntries - i].zres;
+
+
+      }
+
+      //trigger a callback if there is one
+      if(callback){
+
+        callback();
+      }
+
+
+    }
+
+
+
+
+
+
+    function millerFunc(callback){
+
+
+        //get inputs for various vectors using the chrome prompt command
+        var a = prompt("What is your a1 (a) value?");
+
+        //check for bad inputs
+        if(a ==  null){
+          return;
+        }
+        if(a.isNaN){
+          return;
+        }
+        while(a == 0){
+
+          var a = prompt("No, it can't be 0. Try again.")
+        }
+
+
+        var b = prompt("What is your a2 (b) value?");
+
+        if(b ==  null){
+          return;
+        }
+        if(b.isNaN){
+          return;
+        }
+        while(b == 0){
+
+          var b = prompt("No, it can't be 0. Try again.")
+        }
+
+
+        var c = prompt("What is your a3 (c) value?");
+
+        if(c ==  null){
+          return;
+        }
+        if(c.isNaN){
+          return;
+        }
+        while(c == 0){
+
+          var c = prompt("No, it can't be 0. Try again.")
+        }
+
+        ++numMillerEntries;
+
+        //find the inverses
+        var aInv = 1/a;
+        var bInv = 1/b;
+        var cInv = 1/c;
+
+
+        var aTrue = a;
+        var bTrue = b;
+        var cTrue = c;
+
+        //switch negatives to positives
+        if(a < 0){
+            a = a*-1
+        }
+
+        if(b < 0){
+            b = b*-1
+        }
+
+        if(c < 0){
+            c = c*-1
+        }
+
+        //multiply them by a common factor
+        var aRes = aInv*a*b*c;
+        var bRes = bInv*a*b*c;
+        var cRes = cInv*a*b*c;
+
+        //go back through and divide by anny common factors
+        for(var i = a*b*c; i > 1; --i){
+
+          if((aRes % i == 0) && (bRes % i == 0) && (cRes % i == 0)){
+
+            aRes = aRes / i;
+            bRes = bRes / i;
+            cRes = cRes / i;
+          }
+
+        }
+
+        //round the numbers just in case something went wrong
+        aRes = Math.round(aRes);
+        bRes = Math.round(bRes);
+        cRes = Math.round(cRes);
+
+        //turn the results into strings
+        aRes = aRes.toString();
+
+        bRes  = bRes.toString();
+
+        cRes = cRes.toString();
+
+        var resultString;
+
+        //these handle the cases for overline output
+        //they output the result to the "result" div in the HTML doc, in
+        //proper Miller Index format
+        if((aRes > 0) && (bRes > 0) && (cRes > 0)){
+
+          resultString = "<div><p class = \"starter-template\"> (" + aRes + " " + bRes + " " + cRes + ") </p></div>";
+
+
+        }
+        else if((bRes > 0) && (cRes > 0)){
+          aRes = aRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ( <span style=\"text-decoration: overline\">"   +aRes +"</span>" +" "
+           + bRes + " " + cRes + ") </p></div>";
+        }
+        else if((aRes > 0) && (bRes > 0)){
+          cRes = cRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ("+ aRes + "<span style=\"text-decoration: overline\">"
+              + " " + bRes + " " + "</span>" + cRes + ") </p></div>";
+        }
+
+        else if((aRes > 0) && (cRes > 0)){
+          bRes = bRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ("+ aRes + " " + bRes +" " +
+          "<span style=\"text-decoration: overline\">"  +cRes +"</span>" +  ") </p></div>";
+        }
+        else if((aRes > 0)){
+          bRes = bRes * -1; cRes = cRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ("+ aRes + "<span style=\"text-decoration: overline\">"
+            + " " + bRes + " " + cRes + "</span>"  + ") </p></div>";
+        }
+        else if((bRes > 0)){
+          aRes = aRes * -1; cRes = cRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ( <span style=\"text-decoration: overline\">"   +aRes +"</span>" + " " + bRes + " " +
+          "<span style=\"text-decoration: overline\">"  +cRes +"</span>" + ") </p></div>";
+
+
+        }
+        else if((cRes > 0)){
+          aRes = aRes * -1; bRes = bRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ( <span style=\"text-decoration: overline\">"   +aRes
+          + " " + bRes + " " + "</span>"+ cRes + ") </p></div>";
+        }
+        else{
+          aRes = aRes * -1; bRes = bRes * -1; cRes = cRes * -1;
+          resultString = "<div><p class = \"starter-template\"> ( <span style=\"text-decoration: overline\">"   +aRes +
+          " " + bRes + " " + cRes +"</span>" + ") </p></div>";
+        }
+
+
+        //push the results to the stack
+        entriesMillerStack.push({
+          a1: aTrue, a2: bTrue, a3: cTrue, result: resultString
+        });
+
+        //add a node to the table
+        addMillerNode();
+
+        //Trigger callback function
+        if(callback){
+          callback();
+        }
+    }
+
+
+
+
+
+    //this function gets two user inputed vectors, performs a  dot  product operation, and calls anothe rfuncgtion
+    //to add the result to a table
+    function dotFunc(callback){
+
+      //get all the dimensions of all the functions
+      var xone = prompt("What is your first vector's x?")
+      if(xone ==  null){
+        return;
+      }
+      if(xone.isNaN){
+        return;
+      }
+
+      var yone = prompt("What is your first vector's y?")
+      if(yone ==  null){
+        return;
+      }
+      if(yone.isNaN){
+        return;
+      }
+
+      var zone = prompt("What is your first vector's z?")
+      if(zone ==  null){
+        return;
+      }
+      if(zone.isNaN){
+        return;
+      }
+
+      var xtwo = prompt("What is your second vector's x?")
+      if(xtwo ==  null){
+        return;
+      }
+      if(xtwo.isNaN){
+        return;
+      }
+
+      var ytwo = prompt("What is your second vector's y?")
+      if(ytwo ==  null){
+        return;
+      }
+      if(ytwo.isNaN){
+        return;
+      }
+
+      var ztwo = prompt("What is your second vector's z?")
+      if(ztwo ==  null){
+        return;
+      }
+      if(ztwo.isNaN){
+        return;
+      }
+
+      //update number of entries
+      ++numDotEntries;
+
+      //calculate the dot product
+      var resultDot = (xone*xtwo) + (yone*ytwo) + (zone*ztwo);
+
+      //push the result to the stack
+      entriesDotStack.push({
+        x1: xone, y1: yone, z1: zone, x2: xtwo, y2: ytwo, z2: ztwo, result: resultDot
+      });
+
+      //add a row to the table
+      addDotNode();
+
+      //trigger the callback
+      if(callback){
+        callback();
+      }
+
+
+
+    }
+
+
+        //this function gets two user inputed vectors, performs a dot product operation, and calls anothe function
+        //to add the result to a table
+
+    function crossFunc(callback){
+
+
+      //get inputs for all the dimensions of the two input vectos
+      var xone = prompt("What is your first vector's x?")
+      if(xone ==  null){
+        return;
+      }
+      if(xone.isNaN){
+        return;
+      }
+
+      var yone = prompt("What is your first vector's y?")
+      if(yone ==  null){
+        return;
+      }
+      if(yone.isNaN){
+        return;
+      }
+
+      var zone = prompt("What is your first vector's z?")
+      if(zone ==  null){
+        return;
+      }
+      if(zone.isNaN){
+        return;
+      }
+
+      var xtwo = prompt("What is your second vector's x?")
+      if(xtwo ==  null){
+        return;
+      }
+      if(xtwo.isNaN){
+        return;
+      }
+
+      var ytwo = prompt("What is your second vector's y?")
+      if(ytwo ==  null){
+        return;
+      }
+      if(ytwo.isNaN){
+        return;
+      }
+
+      var ztwo = prompt("What is your second vector's z?")
+      if(ztwo ==  null){
+        return;
+      }
+      if(ztwo.isNaN){
+        return;
+      }
+
+      //calculate the result
+      var xResult = (yone*ztwo) - (zone*ytwo);
+      var yResult = (zone*xtwo) - (xone*ztwo);
+      var zResult = (xone*ytwo) - (yone*xtwo);
+
+
+      //update the number of entries
+      ++numCrossEntries;
+
+      //push the result to the stack
+      entriesCrossStack.push({
+        x1: xone, y1: yone, z1: zone, x2: xtwo, y2: ytwo, z2: ztwo, xres: xResult, yres: yResult, zres: zResult
+      });
+
+      //add a table entry
+      addCrossNode();
+
+      //trigger the callback
+      if(callback){
+        callback();
+      }
+
+
+    }
+
+
+  </script>
+
+
+
+
+
+
+</html>

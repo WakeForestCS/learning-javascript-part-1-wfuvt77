@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html land="eng">
+
+  <!-- error webpage-->
+  <head>
+
+    <title>Miller Index Calculator</title>
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+  </head>
+
+  <!-- in doc css adjustments to the style sheet for aesthetic purposes -->
+  <style>
+
+    p,h2,h4,button{
+
+      margin-left: 10px;
+      font-family:sans-serif;
+    }
+
+    h2{
+
+      margin-top:35px;
+    }
+    footer,header{
+
+      background-color: black;
+      color: white;
+      padding: 10px;
+      font-family: sans-serif;
+
+    }
+    header{
+
+      font-size:20px;
+    }
+
+  </style>
+
+  <body>
+    <!-- header for page -->
+    <header>
+        Miller Index Calculator
+    </header>
+
+    <div class = "bodyfull">
+
+    <!-- Title for page -->
+
+    <h2 class = "starter-template">Error!</h2>
+    <br>
+
+    <!-- Description of Miller Indices -->
+
+    <p class = "starter-template">
+      Oops! Something went wrong :(
+    </p>
+
+    <br>
+
+       <!-- footer for a nice finish -->
+       <footer>
+         <div id="footer">
+           <p class>Created by Jack Treadwell for CSC331</p>
+          </div>
+       </footer>
+
+  </body>
+
+  </html>
